@@ -29,52 +29,11 @@ func lenWithoutANSI(text, shell string) int {
 	return count
 }
 
-type formats struct {
-	linechange            string
-	left                  string
-	right                 string
-	creset                string
-	clearOEL              string
-	saveCursorPosition    string
-	restoreCursorPosition string
-}
-
 // AnsiRenderer exposes functionality using ANSI
 type AnsiRenderer struct {
 	buffer  *bytes.Buffer
-	formats *formats
+	formats *ansiFormats
 	shell   string
-}
-
-func (r *AnsiRenderer) init(shell string) {
-	r.shell = shell
-	r.formats = &formats{}
-	switch shell {
-	case zsh:
-		r.formats.linechange = "%%{\x1b[%d%s%%}"
-		r.formats.left = "%%{\x1b[%dC%%}"
-		r.formats.right = "%%{\x1b[%dD%%}"
-		r.formats.creset = "%{\x1b[0m%}"
-		r.formats.clearOEL = "%{\x1b[K%}"
-		r.formats.saveCursorPosition = "%{\x1b7%}"
-		r.formats.restoreCursorPosition = "%{\x1b8%}"
-	case bash:
-		r.formats.linechange = "\\[\x1b[%d%s\\]"
-		r.formats.left = "\\[\x1b[%dC\\]"
-		r.formats.right = "\\[\x1b[%dD\\]"
-		r.formats.creset = "\\[\x1b[0m\\]"
-		r.formats.clearOEL = "\\[\x1b[K\\]"
-		r.formats.saveCursorPosition = "\\[\x1b7\\]"
-		r.formats.restoreCursorPosition = "\\[\x1b8\\]"
-	default:
-		r.formats.linechange = "\x1b[%d%s"
-		r.formats.left = "\x1b[%dC"
-		r.formats.right = "\x1b[%dD"
-		r.formats.creset = "\x1b[0m"
-		r.formats.clearOEL = "\x1b[K"
-		r.formats.saveCursorPosition = "\x1b7"
-		r.formats.restoreCursorPosition = "\x1b8"
-	}
 }
 
 func (r *AnsiRenderer) carriageForward() {
